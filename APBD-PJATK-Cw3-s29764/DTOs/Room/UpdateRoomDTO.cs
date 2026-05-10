@@ -1,12 +1,19 @@
-﻿namespace APBD_PJATK_Cw3_s29764.DTOs.Room;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace APBD_PJATK_Cw3_s29764.DTOs.Room;
 
 public class UpdateRoomDTO
 {
-    int Id { get; set; }
-    string Name { get; set; } = string.Empty;
-    string buildingCode { get; set; } = string.Empty;
-    int floor  { get; set; }
-    int capacity { get; set; }
-    bool hasProjector { get; set; }
-    bool isActive { get; set; }
+    [MinLength(1), MaxLength(50),  Required]
+    public string Name { get; set; } = string.Empty;
+    [MinLength(1), MaxLength(50),  Required]
+    public string buildingCode { get; set; } = string.Empty;
+    [Required]
+    public int floor  { get; set; }
+    [Range(1, int.MaxValue), Required]
+    public int capacity { get; set; }
+    [Required]
+    public bool hasProjector { get; set; }
+    [Required]
+    public bool isActive { get; set; }
 }
