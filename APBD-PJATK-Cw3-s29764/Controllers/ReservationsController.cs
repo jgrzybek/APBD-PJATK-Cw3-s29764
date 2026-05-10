@@ -55,7 +55,20 @@ public class ReservationsController(IReservationService service) : ControllerBas
     [HttpPost]
     public IActionResult Add([FromBody] CreateReservationDTO reservation)
     {
-        var tmpReservation = service.Add(reservation);
+         ReservationDTO tmpReservation;
+
+         try
+         {
+             tmpReservation = service.Add(reservation);
+         }
+         catch (InvalidOperationException e)
+         {
+             return BadRequest(e.Message);
+         }
+         catch (ReservationConflictException e)
+         {
+             return Conflict(e.Message);
+         }
         
         return CreatedAtAction(
             nameof(GetById), 

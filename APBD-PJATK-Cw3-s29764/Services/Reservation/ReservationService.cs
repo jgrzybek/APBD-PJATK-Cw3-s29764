@@ -6,17 +6,17 @@ using APBD_PJATK_Cw3_s29764.Repositories;
 
 namespace APBD_PJATK_Cw3_s29764.Services.Reservation;
 
-public class ReservationService(IReservationRepository repository) : IReservationService
+public class ReservationService(IReservationRepository reservationRepository, IRoomRepository roomRepository) : IReservationService
 {
     public IEnumerable<ReservationDTO> GetAll()
     {
-        return repository.GetAll()
+        return reservationRepository.GetAll()
             .Select(reservation => reservation.ToDto());
     }
 
     public ReservationDTO GetById(int id)
     {
-        var tmpReservation = repository.GetById(id);
+        var tmpReservation = reservationRepository.GetById(id);
         return tmpReservation is not null
             ? tmpReservation.ToDto()
             : throw new ObjectNotInRepositoryException(id);
@@ -26,14 +26,14 @@ public class ReservationService(IReservationRepository repository) : IReservatio
     {
         var reservationToAdd = reservation.ToDomain();
         
-        var room = repository.GetById(reservationToAdd.roomId);
+        var room = roomRepository.GetById(reservationToAdd.roomId);
         if (room == null)
             throw new InvalidOperationException($"Sala o ID {reservationToAdd.roomId} nie istnieje.");
 
-        if (room.status != ReservationStatus.Free)
+        if (!room.isActive)
             throw new InvalidOperationException($"Nie można zarezerwować nieaktywnej sali (ID: {reservationToAdd.roomId}).");
         
-        var conflicting = repository
+        var conflicting = reservationRepository
             .GetAll()
             .Any(r => r.roomId == reservationToAdd.roomId &&
                       r.status != ReservationStatus.Cancelled &&
@@ -41,9 +41,9 @@ public class ReservationService(IReservationRepository repository) : IReservatio
                       r.endTime > reservationToAdd.startTime);
 
         if (conflicting)
-            throw new InvalidOperationException("Rezerwacja nakłada się z inną istniejącą rezerwacją tej sali.");
+            throw new ReservationConflictException("Rezerwacja nakłada się z inną istniejącą rezerwacją tej sali.");
 
-        repository.Add(reservationToAdd);
+        reservationRepository.Add(reservationToAdd);
         return reservationToAdd.ToDto();
     }
 
@@ -52,20 +52,20 @@ public class ReservationService(IReservationRepository repository) : IReservatio
         var tmpReservation = reservation.ToDomain();
         tmpReservation.Id = id;
 
-        return !repository.Update(tmpReservation) 
+        return !reservationRepository.Update(tmpReservation) 
             ? throw new ObjectNotInRepositoryException(id) 
             : tmpReservation.ToDto();
     }
 
     public void Remove(int id)
     {
-        var tmpReservation = repository.GetById(id);
+        var tmpReservation = reservationRepository.GetById(id);
         
         if (tmpReservation is null)
         {
             throw new ObjectNotInRepositoryException(id);
         }
         
-        repository.Remove(tmpReservation);
+        reservationRepository.Remove(tmpReservation);
     }
 }

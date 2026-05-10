@@ -101,5 +101,9 @@ public class RoomsController(IRoomService service) : ControllerBase
         {
             return NotFound(e.Message);
         }
+        catch (FutureReservationException e)
+        {
+            return Conflict(e.Message);
+        }
     }
 }
