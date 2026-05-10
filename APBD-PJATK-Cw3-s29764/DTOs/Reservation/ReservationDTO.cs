@@ -11,6 +11,6 @@ public class ReservationDTO
     public string topic { get; set; } = string.Empty;
     public DateTime startTime { get; set; }
     public DateTime endTime { get; set; }
-    [AllowedValues("Planned", "Confirmed", "Cancelled")]
+    [AllowedValues("Planned", "Confirmed", "Cancelled", "Free")]
     public string status { get; set; }
 }

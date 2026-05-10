@@ -14,7 +14,7 @@ public class CreateReservationDTO
     public DateTime startTime { get; set; }
     [CustomValidation(typeof(CreateReservationDTO), nameof(ValidateEndTimeGreaterThanStartTime)), Required]
     public DateTime endTime { get; set; }
-    [Required, AllowedValues("Planned", "Confirmed", "Cancelled")]
+    [Required, AllowedValues("Planned", "Confirmed", "Cancelled", "Free")]
     public string status { get; set; } =  string.Empty;
     
     public static ValidationResult? ValidateEndTimeGreaterThanStartTime(DateTime endTime, ValidationContext context)

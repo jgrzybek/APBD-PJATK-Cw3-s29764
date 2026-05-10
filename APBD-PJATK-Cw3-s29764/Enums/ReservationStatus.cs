@@ -5,5 +5,6 @@ public enum ReservationStatus
     Planned,
     Confirmed,
     Cancelled,
+    Free,
     Unknown
 }

@@ -1,4 +1,5 @@
 ﻿using APBD_PJATK_Cw3_s29764.DTOs.Reservation;
+using APBD_PJATK_Cw3_s29764.Enums;
 using APBD_PJATK_Cw3_s29764.Exceptions;
 using APBD_PJATK_Cw3_s29764.mappers;
 using APBD_PJATK_Cw3_s29764.Repositories;
@@ -24,8 +25,25 @@ public class ReservationService(IReservationRepository repository) : IReservatio
     public ReservationDTO Add(CreateReservationDTO reservation)
     {
         var reservationToAdd = reservation.ToDomain();
-        repository.Add(reservationToAdd);
         
+        var room = repository.GetById(reservationToAdd.roomId);
+        if (room == null)
+            throw new InvalidOperationException($"Sala o ID {reservationToAdd.roomId} nie istnieje.");
+
+        if (room.status != ReservationStatus.Free)
+            throw new InvalidOperationException($"Nie można zarezerwować nieaktywnej sali (ID: {reservationToAdd.roomId}).");
+        
+        var conflicting = repository
+            .GetAll()
+            .Any(r => r.roomId == reservationToAdd.roomId &&
+                      r.status != ReservationStatus.Cancelled &&
+                      r.startTime < reservationToAdd.endTime &&
+                      r.endTime > reservationToAdd.startTime);
+
+        if (conflicting)
+            throw new InvalidOperationException("Rezerwacja nakłada się z inną istniejącą rezerwacją tej sali.");
+
+        repository.Add(reservationToAdd);
         return reservationToAdd.ToDto();
     }
 

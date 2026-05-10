@@ -66,6 +66,7 @@ public static class ReservationMappingExtension
             "Cancelled" => ReservationStatus.Cancelled,
             "Planned" => ReservationStatus.Planned,
             "Confirmed" => ReservationStatus.Confirmed,
+            "Free" => ReservationStatus.Free,
             _ => ReservationStatus.Unknown
         };
     }
@@ -75,6 +76,7 @@ public static class ReservationMappingExtension
             ReservationStatus.Cancelled => "Cancelled",
             ReservationStatus.Planned => "Planned",
             ReservationStatus.Confirmed => "Confirmed",
+            ReservationStatus.Free => "Free",
             _ => "Unknown"
         };
     }
