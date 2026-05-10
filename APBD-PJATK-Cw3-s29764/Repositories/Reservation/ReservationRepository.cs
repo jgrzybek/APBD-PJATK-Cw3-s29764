@@ -2,7 +2,7 @@
 
 namespace APBD_PJATK_Cw3_s29764.Repositories;
 
-public class ReservationRepository
+public class ReservationRepository : IReservationRepository
 {
     private static int _nextId = 1;
     private readonly List<Reservation> _reservations = [];

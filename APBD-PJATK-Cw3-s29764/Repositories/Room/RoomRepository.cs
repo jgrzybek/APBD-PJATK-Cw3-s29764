@@ -2,7 +2,7 @@
 
 namespace APBD_PJATK_Cw3_s29764.Repositories;
 
-public class RoomRepository
+public class RoomRepository : IRoomRepository
 {
     private static int _nextId = 1;
     private readonly List<Room> _rooms = [];
@@ -42,7 +42,7 @@ public class RoomRepository
         return true;
     }
 
-    public void Delete(Room room)
+    public void Remove(Room room)
     {
         _rooms.Remove(room);
     }
