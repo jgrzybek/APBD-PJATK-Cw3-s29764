@@ -10,9 +10,29 @@ namespace APBD_PJATK_Cw3_s29764.Controllers;
 public class RoomsController(IRoomService service) : ControllerBase
 {
     [HttpGet]
-    public IActionResult GetAll()
+    public IActionResult GetAll(
+        [FromQuery] int? minCapacity,
+        [FromQuery] bool? hasProjector,
+        [FromQuery] bool? activeOnly = true)
     {
-        return Ok(service.GetAll());
+        var rooms = service.GetAll();
+        
+        if (minCapacity.HasValue)
+        {
+            rooms = rooms.Where(r => r.capacity >= minCapacity.Value);
+        }
+
+        if (hasProjector.HasValue)
+        {
+            rooms = rooms.Where(r => r.hasProjector == hasProjector.Value);
+        }
+
+        if (activeOnly == true)
+        {
+            rooms = rooms.Where(r => r.isActive);
+        }
+
+        return Ok(rooms);
     }
 
     [HttpGet("{id:int}")]
@@ -27,8 +47,19 @@ public class RoomsController(IRoomService service) : ControllerBase
             return NotFound(e.Message);
         }
     }
-    
-    
+
+    [HttpGet("/rooms/building/{buildingCode}")]
+    public IActionResult GetByBuildingCode([FromRoute] string buildingCode)
+    {
+        try
+        {
+            return Ok(service.GetByBuildingCode(buildingCode));
+        }
+        catch (ObjectNotInRepositoryException e)
+        {
+            return NotFound(e.Message);
+        }
+    }
 
     [HttpPost]
     public IActionResult Add([FromBody] CreateRoomDTO room)

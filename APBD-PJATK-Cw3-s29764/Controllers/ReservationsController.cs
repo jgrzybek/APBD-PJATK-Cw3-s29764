@@ -10,9 +10,33 @@ namespace APBD_PJATK_Cw3_s29764.Controllers;
 public class ReservationsController(IReservationService service) : ControllerBase
 {
     [HttpGet]
-    public IActionResult GetAll()
+    public IActionResult GetAll(
+        [FromQuery] DateTime? date,
+        [FromQuery] string? status,
+        [FromQuery] int? roomId)
     {
-        return Ok(service.GetAll());
+        var reservations = service.GetAll();
+        
+        if (date.HasValue)
+        {
+            var filterDate = date.Value.Date;
+            reservations = reservations.Where(r =>
+                r.startTime.Date <= filterDate && 
+                r.endTime.Date >= filterDate);
+        }
+        
+        if (!string.IsNullOrWhiteSpace(status))
+        {
+            reservations = reservations.Where(r =>
+                r.status.Equals(status, StringComparison.OrdinalIgnoreCase));
+        }
+        
+        if (roomId.HasValue)
+        {
+            reservations = reservations.Where(r => r.roomId == roomId.Value);
+        }
+
+        return Ok(reservations.ToList());
     }
 
     [HttpGet("{id:int}")]
